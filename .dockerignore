@@ -1,0 +1,10 @@
+.github/
+docker-compose.yaml
+Dockerfile
+script.sql
+.dockerignore
+infra/
+docker/
+venv/
+dummy.yaml
+.env

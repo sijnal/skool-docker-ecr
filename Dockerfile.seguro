@@ -1,0 +1,40 @@
+# Etapa 1: Construcción (builder)
+FROM python:3.13.7-alpine3.22 AS builder
+
+WORKDIR /app
+
+# Copia el archivo de dependencias
+COPY requirements.txt .
+
+# Instala las dependencias en un directorio temporal
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Etapa 2: Producción (runtime)
+FROM python:3.13.7-alpine3.22
+
+# Crear usuario no-root para seguridad
+RUN adduser -D -s /bin/sh appuser
+
+WORKDIR /app
+
+# Copia las dependencias desde builder al directorio del usuario
+COPY --from=builder /root/.local /home/appuser/.local
+
+# Cambiar propiedad de los archivos al usuario no-root
+RUN chown -R appuser:appuser /app /home/appuser/.local
+
+# Cambiar al usuario no-root
+USER appuser
+
+# Asegurar que los scripts en .local están disponibles
+ENV PATH=/home/appuser/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+
+# Copia solo los archivos necesarios
+COPY --chown=appuser:appuser app.py /app/app.py
+COPY --chown=appuser:appuser templates /app/templates
+
+EXPOSE 80
+
+CMD ["python", "/app/app.py"]
+

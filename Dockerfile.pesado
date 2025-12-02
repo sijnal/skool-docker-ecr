@@ -1,0 +1,22 @@
+FROM python:3.13.7
+
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia el archivo de dependencias
+COPY requirements.txt .
+
+# Instala las dependencias (sin optimizaciones)
+RUN pip install -r requirements.txt
+
+# Copia el resto de la aplicación
+COPY app.py /app/app.py
+
+# Copia la carpeta de plantillas
+COPY templates /app/templates
+
+# Exponer el puerto en el que la aplicación escuchará
+EXPOSE 80
+
+# Define el comando por defecto para ejecutar el script
+CMD ["python", "/app/app.py"]

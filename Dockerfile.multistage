@@ -1,0 +1,29 @@
+# Etapa 1: Construcción (builder)
+FROM python:3.13.7-alpine3.22 AS builder
+
+WORKDIR /app
+
+# Copia el archivo de dependencias
+COPY requirements.txt .
+
+# Instala las dependencias en un directorio temporal
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Etapa 2: Producción (runtime)
+FROM python:3.13.7-alpine3.22
+
+WORKDIR /app
+
+# Copia solo las dependencias
+COPY --from=builder /root/.local /root/.local
+
+ENV PATH=/root/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+
+# Copia solo los archivos necesarios
+COPY app.py /app/app.py
+COPY templates /app/templates
+
+EXPOSE 80
+
+CMD ["python", "/app/app.py"]

@@ -1,0 +1,57 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: hello_app_db
+      MYSQL_USER: hello_app_user
+      MYSQL_PASSWORD: hello_app_password
+    volumes:
+      - ./script.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    ports:
+      - target: 3306
+        published: 3306
+        protocol: tcp
+        mode: host
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3306", "--protocol=tcp"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  hello-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TITLE=DOCKER-COMPOSE
+      - MICROSERVICIO=MS-DOCKER-COMPOSE
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=hello_app_user
+      - DB_PASSWORD=hello_app_password
+      - DB_NAME=hello_app_db
+    volumes:
+      - ./app.py:/app/app.py
+      - ./templates:/app/templates
+    depends_on:
+      - mysql
+    ports:
+      - 80:80
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=hello_app_user
+      - PMA_PASSWORD=hello_app_password
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
