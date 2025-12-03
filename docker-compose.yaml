@@ -8,7 +8,6 @@ services:
       MYSQL_USER: hello_app_user
       MYSQL_PASSWORD: hello_app_password
     volumes:
-      - ./script.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     ports:
       - target: 3306
@@ -16,10 +15,11 @@ services:
         protocol: tcp
         mode: host
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3306", "--protocol=tcp"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 40s
 
   hello-app:
     build:
@@ -37,7 +37,8 @@ services:
       - ./app.py:/app/app.py
       - ./templates:/app/templates
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - 80:80
 
@@ -51,7 +52,8 @@ services:
       - PMA_USER=hello_app_user
       - PMA_PASSWORD=hello_app_password
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
 volumes:
   mysql_data:

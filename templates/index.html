@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ microservice }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            color: #333;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: #555;
+            margin-bottom: 1em;
+        }
+        p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            color: #666;
+        }
+        .table-container {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .table-container th, .table-container td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .table-container th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        .table-container td {
+            background-color: #fff;
+        }
+        .table-container tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ microservice }}</h1>
+        <h2>{{ title }}</h2>
+        <p>Hostname: <strong>{{ hostname }}</strong></p>
+        <p>Time: <strong>{{ current_time }}</strong></p>
+    </div>
+    {% if db_host != 'localhost' %}
+    <div class="container">
+        <h1>Base de Datos</h1>
+        <p>Host: <strong>{{ db_host }}</strong></p>
+        <p>Puerto: <strong>{{ db_port }}</strong></p>
+        <p>User: <strong>{{ db_user }}</strong></p>
+        <p>Database: <strong>{{ db_name }}</strong></p>
+        
+        <!-- Mostrar la lista de tablas de la base de datos -->
+        <table class="table-container">
+            <thead>
+                <tr>
+                    <th>Lista de tablas en la base de datos:</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for table in tables %}
+                <tr>
+                    <td>{{ table }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Mostrar la versión y el entorno para tener una mejor vista de los despliegues --> 
+    <div class="container">
+        <p>Version: <strong>{{ version }}</strong></p>
+        <p>Environment: <strong>{{ environment }}</strong></p>
+    </div>
+</body>
+</html>
